@@ -195,7 +195,7 @@ class Format(unicode):
                 if path_to:
                     raise ValueError("'#' and '=>' must be used separately")
                 field, path_to = f.split('#')
-            elif ':' in f:
+            elif ':' in f and not f.endswith('!'):
                 if path_to:
                     raise ValueError("':' and '=>' must be used separately")
                 field, path_to = f.split(':')
@@ -216,13 +216,15 @@ class Format(unicode):
             if field.startswith('~'):
                 field = field.replace('~', '')
                 remove.append(field)
-            fields.append(field)
-            if '#' in f:
-                copy[field] = path_to
-            elif ':' in f:
-                move[field] = path_to
-            elif '=>' in f:
-                rename[field] = path_to
+            if field and field not in fields:
+                fields.append(field)
+            if path_to:
+                if '#' in f:
+                    copy[field] = path_to
+                elif ':' in f:
+                    move[field] = path_to
+                elif '=>' in f:
+                    rename[field] = path_to
         if ex:
             fields = None
 
