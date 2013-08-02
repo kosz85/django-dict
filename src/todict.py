@@ -112,13 +112,18 @@ class FormatedDict(dict):
         for pa in path[:-1]:
             if pa.startswith('!'):
                 pa = int(pa[1:])
-            if not hasattr(p, '__len__') or pa >= len(p):
-                return d
+                if not hasattr(p, '__len__') or pa >= len(p):
+                    return d
             p = p[pa]
         pa = path[-1]
+
         if pa.startswith('!'):
             pa = int(pa[1:])
-        if not hasattr(p, '__len__') or pa >= len(p):
+            if hasattr(p, '__len__') and pa < len(p):
+                del p[pa]
+            return d
+
+        if pa in p:
             del p[pa]
         return d
 
