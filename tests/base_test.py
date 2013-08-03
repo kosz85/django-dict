@@ -100,5 +100,44 @@ class TestFormatedDict(TestCase):
         self.assertEqual('X2',
                          FormatedDict._get_path(self.data, ['z', '!1', 'x']))
 
+    def test_init(self):
+        fd = FormatedDict()
+        self.assertEqual(fd.format, None)
+
+        fd = FormatedDict(self.data)
+        self.assertEqual(fd.format, None)
+        self.assertEqual(fd['a'], self.data['a'])
+
+        fd = FormatedDict(format="a=>aa")
+        self.assertEqual(fd.format, "a=>aa")
+        fd = FormatedDict(self.data, format="a=>aa")
+        self.assertEqual(fd.format, "a=>aa")
+        self.assertEqual(fd['a'], self.data['a'])
+
+    def test_to_dict(self):
+        self.assertIn('a',  self.data)
+        self.assertIn('b',  self.data)
+        fd = FormatedDict(self.data, format="a")
+        new = fd.to_dict()
+        self.assertIn('a', new)
+        self.assertNotIn('b', new)
+        self.assertIn('a',  self.data)
+        self.assertIn('b',  self.data)
+
+        self.assertNotIn('aa',  self.data)
+        fd = FormatedDict(self.data, format="a=>aa")
+        new = fd.to_dict()
+        self.assertIn('aa', new)
+        self.assertNotIn('aa',  self.data)
+
+        self.assertIn('a',  self.data)
+        fd = FormatedDict(self.data, format="-a")
+        new = fd.to_dict()
+        self.assertNotIn('a', new)
+        self.assertIn('b', new)
+        self.assertIn('z', new)
+        self.assertIn('a',  self.data)
+
+
 if __name__ == "__main__":
     main()
