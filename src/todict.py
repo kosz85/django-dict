@@ -27,8 +27,12 @@ class FormatedDict(dict):
             convert
         """
         key = lambda name: kwargs.get('rename', {}).get(name, name)
-        cnv = lambda value: kwargs.get('convert', {}).get(type(value),
-                                                          lambda v: v)(value)
+#        cnv = lambda value: kwargs.get('convert', {}).get(type(value),
+#                                                          lambda v: v)(value)
+        convert = kwargs.get('convert', {})
+        cnv = lambda name, value: convert.get(name,
+                                              convert.get(type(value),
+                                                          lambda v: v))(value)
         exc = lambda name: not ((not kwargs.get('fields') or
                                  name in kwargs.get('fields', [])) and
                                 (not kwargs.get('exclude') or
@@ -49,7 +53,13 @@ class FormatedDict(dict):
                            for n, v in (kw.get('rename') or {}).items()
                            if n.split(separator)[0] == name
                            and len(n) > len(name)},
-                'convert': kw.get('convert') or {},
+                'convert': dict([(separator.join(k.split(separator)[1:]), v)
+                                if isinstance(k, basestring) and
+                                   k.split(separator)[0] == name and
+                                   len(k) > len(name)
+                                else (k, v)
+                                for k, v in (kw.get('convert') or {}).items()
+                            ]),
             }
 
         if not format and self.format:
@@ -70,7 +80,7 @@ class FormatedDict(dict):
                             **get_kwargs(name, kwargs))
                     else:
                         break
-            d[key(name)] = cnv(value)
+            d[key(name)] = cnv(key(name), value)
 
         replace = [(k, v, FormatedDict._mv)
                    for k, v in kwargs.get('move', {}).items()]
@@ -307,8 +317,12 @@ class ToDictClass(object):
         ~field! field|another_field:path
         """
         key = lambda name: kwargs.get('rename', {}).get(name, name)
-        cnv = lambda value: kwargs.get('convert', {}).get(type(value),
-                                                          lambda v: v)(value)
+        convert = kwargs.get('convert', {})
+        cnv = lambda name, value: convert.get(name,
+                                              convert.get(type(value),
+                                                          lambda v: v))(value)
+#        cnv = lambda value: kwargs.get('convert', {}).get(type(value),
+#                                                          lambda v: v)(value)
         exc = lambda name: not ((not kwargs.get('fields') or
                                  name in kwargs.get('fields', [])) and
                                 (not kwargs.get('exclude') or
@@ -333,7 +347,13 @@ class ToDictClass(object):
                            for n, v in (kw.get('rename') or {}).items()
                            if n.split(separator)[0] == name
                            and len(n) > len(name)},
-                'convert': kw.get('convert') or {},
+                'convert': dict([(separator.join(k.split(separator)[1:]), v)
+                                if isinstance(k, basestring) and
+                                   k.split(separator)[0] == name and
+                                   len(k) > len(name)
+                                else (k, v)
+                                for k, v in (kw.get('convert') or {}).items()
+                            ]),
             }
 
         if format:
@@ -387,7 +407,7 @@ class ToDictClass(object):
                 value = [ro.to_dict(**get_kwargs(name, kwargs))
                          for ro in value.all()]
             else:  # Normal field
-                value = cnv(value)
+                value = cnv(key(name), value)
             d[key(name)] = value
         if 'fields' in kwargs:
             del kwargs['fields']
