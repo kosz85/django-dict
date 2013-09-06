@@ -1,4 +1,6 @@
+import datetime
 from unittest import TestCase, main
+
 from src.todict import FormatedDict
 
 
@@ -138,6 +140,18 @@ class TestFormatedDict(TestCase):
         self.assertIn('z', new)
         self.assertIn('a',  self.data)
 
+    def test_convert(self):
+        self.data['time'] = datetime.datetime(2013, 1, 1)
+
+        fd = FormatedDict(self.data)
+        dd = fd.to_dict(convert={datetime.datetime: lambda x: x.strftime("%Y-%m-%d")})
+        self.assertIn('time', dd)
+        self.assertEqual(dd['time'], '2013-01-01')
+
+        fd = FormatedDict(self.data)
+        dd = fd.to_dict(convert={'time': lambda x: x.strftime("%Y-%m-%d")})
+        self.assertIn('time', dd)
+        self.assertEqual(dd['time'], '2013-01-01')
 
 if __name__ == "__main__":
     main()
