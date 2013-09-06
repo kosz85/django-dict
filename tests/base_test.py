@@ -153,5 +153,15 @@ class TestFormatedDict(TestCase):
         self.assertIn('time', dd)
         self.assertEqual(dd['time'], '2013-01-01')
 
+        # nested convert
+        self.data['time'] = {'time': datetime.datetime(2013, 1, 1)}
+
+        fd = FormatedDict(self.data)
+        dd = fd.to_dict(convert={'time|time': lambda x: x.strftime("%Y-%m-%d")})
+        self.assertIn('time', dd)
+        self.assertIn('time', dd['time'])
+        self.assertEqual(dd['time']['time'], '2013-01-01')
+
+
 if __name__ == "__main__":
     main()

@@ -53,7 +53,13 @@ class FormatedDict(dict):
                            for n, v in (kw.get('rename') or {}).items()
                            if n.split(separator)[0] == name
                            and len(n) > len(name)},
-                'convert': kw.get('convert') or {},
+                'convert': dict([(separator.join(k.split(separator)[1:]), v)
+                                if isinstance(k, basestring) and
+                                   k.split(separator)[0] == name and
+                                   len(k) > len(name)
+                                else (k, v)
+                                for k, v in (kw.get('convert') or {}).items()
+                            ]),
             }
 
         if not format and self.format:
@@ -341,7 +347,13 @@ class ToDictClass(object):
                            for n, v in (kw.get('rename') or {}).items()
                            if n.split(separator)[0] == name
                            and len(n) > len(name)},
-                'convert': kw.get('convert') or {},
+                'convert': dict([(separator.join(k.split(separator)[1:]), v)
+                                if isinstance(k, basestring) and
+                                   k.split(separator)[0] == name and
+                                   len(k) > len(name)
+                                else (k, v)
+                                for k, v in (kw.get('convert') or {}).items()
+                            ]),
             }
 
         if format:
