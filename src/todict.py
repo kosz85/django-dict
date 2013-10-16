@@ -378,6 +378,7 @@ class ToDictClass(object):
                 query = value.filter(**fetch_dict[name][0])
                 if fetch_dict[name][1]:
                     query = query.order_by(*fetch_dict[name][1])
+                query = query.distinct()
                 if name in fetch_keys:
                     d[key(name)] = [ro.to_dict(**get_kwargs(name, kwargs))
                                     for ro in query]
@@ -390,6 +391,7 @@ class ToDictClass(object):
                 query = value.filter(**fetch_dict[name][0])
                 if fetch_dict[name][1]:
                     query = query.order_by(*fetch_dict[name][1])
+                query = query.distinct()
 
                 if name in fetch_keys:
                     d[key(name)] = [ro.to_dict(**get_kwargs(name, kwargs))
